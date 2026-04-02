@@ -2,7 +2,7 @@
 
 Shadow Weaver is a professional yield strategy built for the Ranger Earn ecosystem. It harvests funding rate premiums on Drift Protocol while enforcing bank-grade capital protection via an immutable on-chain risk engine.
 
-> **Pitch for judges:** Shadow Weaver is the safest vault in this hackathon, combining hard-coded loss protection at the smart-contract level with market-neutral funding arbitrage on Solana.
+>  Shadow Weaver is the safest vault in this hackathon, combining hard-coded loss protection at the smart-contract level with market-neutral funding arbitrage on Solana.
 
 ---
 
@@ -92,8 +92,7 @@ Judges can use these links to confirm the vault’s deployment, initial capital 
 
 ## Setup & Running Locally
 
-Below is the high-level setup to run the vault and the Shadow Weaver bot locally.  
-You can adapt command names to match the scripts defined in this repository.
+This section documents the **exact commands** used to set up the environment, deploy the program, initialize the vault on Devnet, and run the Shadow Weaver bot.
 
 ### Prerequisites
 
@@ -101,53 +100,52 @@ You can adapt command names to match the scripts defined in this repository.
 - **Rust** (stable toolchain).  
 - **Anchor CLI** installed and configured.  
 - **Node.js** and **TypeScript** installed.  
-- A funded Solana keypair for Devnet to pay deployment and transaction fees.
+- A funded Solana Devnet keypair at `~/.config/solana/id.json`.
 
-### 1. Build and Deploy the Vault Program
+### 1. Install Node Dependencies
 
-From the Anchor workspace root:
+From the project root, install the required Node/TypeScript dependencies:
 
 ```bash
-# Compile the on-chain program
-anchor build
-
-# Deploy to Solana Devnet
-anchor deploy
-Ensure your Anchor.toml and Solana CLI are pointing at Devnet and using the correct wallet keypair.
-
-2. Configure Environment
-Set the required environment variables for both the program and the bot, for example:
-
-Wallet keypair path (local Solana key).
-
-RPC URL for Solana Devnet.
-
-Drift endpoint / configuration.
-
-Any Ranger- or hackathon-specific IDs if required.
-
-This configuration is typically done via a .env file or shell environment variables, depending on your setup.
-
-3. Run the Shadow Weaver Bot
-From the bot / executor directory (TypeScript project):
+npm install @solana/web3.js @drift-labs/sdk @coral-xyz/anchor ts-node typescript
+2. Build and Deploy the Vault Program
+Use Anchor to compile and deploy the on-chain smart contract to Solana Devnet:
 
 bash
-# Install dependencies (example)
-npm install
+anchor build
+anchor deploy
+Ensure your Anchor and Solana configuration are pointing to Devnet and using the correct wallet.
 
-# Start the executor (example)
-npm run start
-The bot will:
+3. Initialize Devnet Vault Infrastructure
+With the program deployed, initialize the vault and connect it to Drift using the provided TypeScript scripts.
+Run the scripts in the following order, setting the provider URL and wallet inline:
 
-Connect to Drift using the configured credentials.
+bash
+ANCHOR_PROVIDER_URL="https://api.devnet.solana.com" \
+ANCHOR_WALLET=~/.config/solana/id.json \
+npx ts-node scripts/initialize_devnet.ts
 
-Continuously pull funding and market data.
+ANCHOR_PROVIDER_URL="https://api.devnet.solana.com" \
+ANCHOR_WALLET=~/.config/solana/id.json \
+npx ts-node scripts/open_drift_account.ts
 
-Simulate and execute market-neutral allocations according to the vault’s parameters.
+ANCHOR_PROVIDER_URL="https://api.devnet.solana.com" \
+ANCHOR_WALLET=~/.config/solana/id.json \
+npx ts-node scripts/deposit_into_drift.ts
+These scripts:
 
-Print logs and profit calculations directly to the terminal.
+Initialize the vault state on Devnet.
 
-Replace the exact commands above with the scripts defined in your package.json or preferred Node runner.
+Open and wire the institutional Drift account for the vault.
+
+Deposit capital from the vault into Drift to fund the strategy.
+
+4. Run the Shadow Weaver Bot (Delta-Neutral Arbitrage Simulator)
+Finally, start the Shadow Weaver executor, which runs the delta-neutral funding arbitrage logic:
+
+bash
+npx ts-node bot/shadow_weaver.ts
+This launches the TypeScript bot, connects to Drift, streams market and funding data, and executes the strategy while printing logs and profit calculations directly to the terminal.
 
 Simulation & Performance
 The strategy has been tested against live market data using historical funding rates and price feeds from the SOL perpetual market on Drift. Under recent market conditions, simulations project an annualized yield above 100%, significantly outperforming the minimum performance bar required for this hackathon.
@@ -164,4 +162,3 @@ Expand support from SOL-PERP to a diversified basket of perp markets on Drift.
 Integrate more advanced execution logic in Shadow Weaver (multi-venue, multi-asset funding optimization).
 
 Add formal audits and monitoring to harden the strategy for mainnet deployment.
-
