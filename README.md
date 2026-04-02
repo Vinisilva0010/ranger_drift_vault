@@ -1,7 +1,8 @@
 # Shadow Weaver Yield Strategy
 
 Shadow Weaver is a professional yield strategy built for the Ranger Earn ecosystem. It harvests funding rate premiums on Drift Protocol while enforcing bank-grade capital protection via an immutable on-chain risk engine.
-
+docs: https://vinisilva0010.github.io/shadow-weaver-docs/
+video: https://youtu.be/sGLtnZFak50
 >  Shadow Weaver is the safest vault in this hackathon, combining hard-coded loss protection at the smart-contract level with market-neutral funding arbitrage on Solana.
 
 ---
