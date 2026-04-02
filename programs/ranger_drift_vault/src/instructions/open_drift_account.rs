@@ -1,10 +1,12 @@
 use anchor_lang::prelude::*;
 use crate::state::RangerVault;
 
-// A MÁGICA ESTÁ AQUI: Adicionamos "crate::" porque o módulo foi gerado internamente pela macro no lib.rs
+// Importamos a infraestrutura nativa
 use crate::drift::cpi::accounts::InitializeUser;
+use crate::drift::cpi::accounts::InitializeUserStats; // <-- NOVO: O pacote que faltava
 use crate::drift::program::Drift;
 use crate::drift::cpi::initialize_user;
+use crate::drift::cpi::initialize_user_stats; // <-- NOVO: A instrução de inicialização
 
 #[derive(Accounts)]
 pub struct OpenDriftAccount<'info> {
@@ -50,6 +52,26 @@ pub fn handle_open_drift_account(ctx: Context<OpenDriftAccount>) -> Result<()> {
         &[bump],
     ]];
 
+    // --- PASSO 1: CRIAR O USER STATS (Resolvendo o Erro 3007) ---
+    let cpi_stats_accounts = InitializeUserStats {
+        user_stats: ctx.accounts.drift_user_stats.to_account_info(),
+        state: ctx.accounts.drift_state.to_account_info(),
+        authority: vault_state.to_account_info(),
+        payer: ctx.accounts.admin.to_account_info(),
+        rent: ctx.accounts.rent.to_account_info(),
+        system_program: ctx.accounts.system_program.to_account_info(),
+    };
+
+    let cpi_stats_ctx = CpiContext::new_with_signer(
+        ctx.accounts.drift_program.to_account_info(),
+        cpi_stats_accounts,
+        signer_seeds,
+    );
+
+    // O Cofre assina e cria a conta de métricas na Drift
+    initialize_user_stats(cpi_stats_ctx)?;
+
+    // --- PASSO 2: CRIAR O USER (Sub-Account) ---
     let cpi_accounts = InitializeUser {
         user: ctx.accounts.drift_user.to_account_info(),
         user_stats: ctx.accounts.drift_user_stats.to_account_info(),
@@ -71,7 +93,6 @@ pub fn handle_open_drift_account(ctx: Context<OpenDriftAccount>) -> Result<()> {
     let name_str = b"Ranger Drift Vault";
     name[..name_str.len()].copy_from_slice(name_str);
 
-    // E chamamos com a referência interna corrigida
     initialize_user(cpi_ctx, sub_account_id, name)?;
 
     vault_state.drift_user_account = ctx.accounts.drift_user.key();

@@ -1,0 +1,12 @@
+
+endereço
+4Hvv6Fmjfwuh2B8E7CMw7bygnN6rcxBNvmbL2LV2wiFs
+
+
+
+chave:
+4NCBRf1QZ43Ahx9z9nSnRi9TkN79ba6yHndH8V9hNRauhhSiVRfEvrGHTC8GHiCYWQNTvTTUWSjjVbjg2DUZp5ho
+
+
+chave da conta 1 phanthon
+mwf9mm4HWmjxpY54DPVgtomkokcE4D5hLf9ph8xnGgTSSYNvMpmWAwK8N52axa4he1nSikzUECfYvn74JUfmnbJ

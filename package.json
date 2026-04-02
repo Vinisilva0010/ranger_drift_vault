@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1",
+    "@drift-labs/sdk": "^2.155.0",
     "@solana/spl-token": "^0.4.14"
   },
   "devDependencies": {
